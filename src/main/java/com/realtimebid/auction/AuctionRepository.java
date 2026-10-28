@@ -1,5 +1,6 @@
 package com.realtimebid.auction;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +22,8 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 	List<Auction> findByStatus(AuctionStatus status);
 
 	List<Auction> findBySeller(User seller);
+
+	List<Auction> findByStatusAndStartTimeBefore(AuctionStatus status, LocalDateTime time);
+
+	List<Auction> findByStatusAndEndTimeBefore(AuctionStatus status, LocalDateTime time);
 }

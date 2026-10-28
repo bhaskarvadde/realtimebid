@@ -69,4 +69,8 @@ public class Auction {
 	
 	@Column(precision = 10, scale = 2)
 	private BigDecimal currentHighestBid;
+	
+	@ManyToOne
+	@JoinColumn(name = "winner_id")
+	private User winner;
 }
