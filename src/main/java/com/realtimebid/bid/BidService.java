@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.realtimebid.auction.Auction;
 import com.realtimebid.auction.AuctionRepository;
+import com.realtimebid.auction.AuctionStatus;
 import com.realtimebid.bid.dto.BidEvent;
 import com.realtimebid.bid.dto.BidRequest;
 import com.realtimebid.exception.AuctionNotFoundException;
@@ -63,6 +64,10 @@ public class BidService {
     protected Bid doPlaceBid(BidRequest request, User bidder) {
         Auction auction = auctionRepository.findById(request.getAuctionId())
                 .orElseThrow(() -> new AuctionNotFoundException("Auction not found: " + request.getAuctionId()));
+        
+        if (auction.getStatus() != AuctionStatus.ACTIVE) {
+            throw new InvalidBidException("Bidding is only open on live auctions");
+        }
 
         if (auction.getSeller().getId().equals(bidder.getId())) {
             throw new InvalidBidException("Cannot bid on your own auction");
@@ -102,5 +107,9 @@ public class BidService {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException("Auction not found: " + auctionId));
         return bidRepository.findByAuctionOrderByCreatedAtDesc(auction);
+    }
+    
+    public List<Bid> getBidsForUser(User user) {
+        return bidRepository.findByBidderOrderByCreatedAtDesc(user);
     }
 }

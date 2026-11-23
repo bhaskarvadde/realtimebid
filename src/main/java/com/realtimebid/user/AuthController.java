@@ -12,6 +12,8 @@ import com.realtimebid.user.dto.AuthResponse;
 import com.realtimebid.user.dto.LoginRequest;
 import com.realtimebid.user.dto.RegisterRequest;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -24,7 +26,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+	public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
 		User createdUser = userService.register(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body("Registered Successfully " + createdUser.getEmail());

@@ -40,7 +40,7 @@ class BidConcurrencyTest {
         Auction auction = new Auction();
         auction.setTitle("Concurrency Test Item");
         auction.setStartingPrice(new BigDecimal("100"));
-        auction.setStatus(AuctionStatus.SCHEDULED);
+        auction.setStatus(AuctionStatus.ACTIVE);
         auction.setSeller(seller);
         auctionRepository.save(auction);
 

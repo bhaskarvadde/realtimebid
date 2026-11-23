@@ -73,4 +73,7 @@ public class Auction {
 	@ManyToOne
 	@JoinColumn(name = "winner_id")
 	private User winner;
+	
+	@Column(length = 1000)
+	private String imageUrl;
 }

@@ -18,36 +18,54 @@ import com.realtimebid.exception.InvalidCredentialsException;
 import com.realtimebid.user.User;
 import com.realtimebid.user.UserRepository;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/auctions")
 public class AuctionController {
 
-	private final AuctionService auctionService;
-	private final UserRepository userRepository;
+    private final AuctionService auctionService;
+    private final UserRepository userRepository;
 
-	public AuctionController(AuctionService auctionService, UserRepository userRepository) {
-		this.auctionService = auctionService;
-		this.userRepository = userRepository;
-	}
+    public AuctionController(AuctionService auctionService, UserRepository userRepository) {
+        this.auctionService = auctionService;
+        this.userRepository = userRepository;
+    }
 
-	@PostMapping
-	public ResponseEntity<AuctionResponse> createAuction(@RequestBody AuctionRequest request) {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    @PostMapping
+    public ResponseEntity<AuctionResponse> createAuction(@Valid @RequestBody AuctionRequest request) {
+        AuctionResponse response = auctionService.createAuction(request, currentUser());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
-		User seller = userRepository.findByEmail(email)
-				.orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+    @GetMapping
+    public ResponseEntity<List<AuctionResponse>> getActiveAuctions() {
+        return ResponseEntity.ok(auctionService.getActiveAuctions());
+    }
 
-		AuctionResponse response = auctionService.createAuction(request, seller);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
-	}
+    @GetMapping("/all")
+    public ResponseEntity<List<AuctionResponse>> getAllAuctions() {
+        return ResponseEntity.ok(auctionService.getAllAuctions());
+    }
 
-	@GetMapping
-	public ResponseEntity<List<AuctionResponse>> getActiveAuctions() {
-		return ResponseEntity.ok(auctionService.getActiveAuctions());
-	}
+    @GetMapping("/mine")
+    public ResponseEntity<List<AuctionResponse>> getMyAuctions() {
+        return ResponseEntity.ok(auctionService.getAuctionsBySeller(currentUser()));
+    }
 
-	@GetMapping("/{id}")
-	public ResponseEntity<AuctionResponse> getAuctionById(@PathVariable Long id) {
-		return ResponseEntity.ok(auctionService.getAuctionById(id));
-	}
+    @GetMapping("/won")
+    public ResponseEntity<List<AuctionResponse>> getWonAuctions() {
+        return ResponseEntity.ok(auctionService.getWonAuctions(currentUser()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AuctionResponse> getAuctionById(@PathVariable Long id) {
+        return ResponseEntity.ok(auctionService.getAuctionById(id));
+    }
+
+    private User currentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+    }
 }

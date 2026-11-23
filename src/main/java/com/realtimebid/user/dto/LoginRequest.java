@@ -1,10 +1,25 @@
+//package com.realtimebid.user.dto;
+//
+//import lombok.Data;
+//
+//@Data
+//public class LoginRequest {
+//	private String email;
+//	
+//	private String password;
+//}
+
 package com.realtimebid.user.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class LoginRequest {
-	private String email;
-	
-	private String password;
+    @NotBlank @Email
+    private String email;
+
+    @NotBlank
+    private String password;
 }
