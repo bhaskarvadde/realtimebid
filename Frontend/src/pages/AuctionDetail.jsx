@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Client } from "@stomp/stompjs";
@@ -34,7 +33,7 @@ export default function AuctionDetail() {
     loadData();
 
     const client = new Client({
-      brokerURL: "ws://localhost:8080/ws",
+      brokerURL: import.meta.env.VITE_WS_URL || "ws://localhost:8080/ws",
       reconnectDelay: 5000,
       onConnect: () => {
         client.subscribe(`/topic/auctions/${id}`, (message) => {
@@ -42,7 +41,7 @@ export default function AuctionDetail() {
 
           if ("finalPrice" in event) {
             setLiveMessage(
-              `Auction closed. Winner: ${event.winningBidderName ?? "no bids"} at $${event.finalPrice}`
+              `Auction closed. Winner: ${event.winningBidderName ?? "no bids"} at $${event.finalPrice}`,
             );
           } else {
             setLiveMessage(`New bid: $${event.amount} by ${event.bidderName}`);
@@ -100,7 +99,7 @@ export default function AuctionDetail() {
     auction.currentHighestBid !== undefined;
 
   const floor = Number(
-    hasBids ? auction.currentHighestBid : auction.startingPrice
+    hasBids ? auction.currentHighestBid : auction.startingPrice,
   );
 
   const ended = auction.status === "ENDED";
@@ -111,17 +110,12 @@ export default function AuctionDetail() {
         ← Back to auctions
       </Link>
 
-      {liveMessage && (
-        <div className="alert alert-live">{liveMessage}</div>
-      )}
+      {liveMessage && <div className="alert alert-live">{liveMessage}</div>}
 
       <div className="detail">
         <div>
           <div className="detail-media">
-            <AuctionImage
-              src={auction.imageUrl}
-              title={auction.title}
-            />
+            <AuctionImage src={auction.imageUrl} title={auction.title} />
           </div>
 
           <div className="panel" style={{ marginTop: 24 }}>
@@ -137,9 +131,7 @@ export default function AuctionDetail() {
             <div className="kv-grid">
               <div>
                 <div className="metric-label">Seller</div>
-                <div className="metric-value">
-                  {auction.sellerName}
-                </div>
+                <div className="metric-value">{auction.sellerName}</div>
               </div>
 
               <div>
@@ -179,20 +171,13 @@ export default function AuctionDetail() {
                   key={b.id}
                 >
                   <div className="bidder">
-                    <span className="avatar">
-                      {initials(b.bidderName)}
-                    </span>
+                    <span className="avatar">{initials(b.bidderName)}</span>
 
                     <div>
-                      <div style={{ fontWeight: 600 }}>
-                        {b.bidderName}
-                      </div>
+                      <div style={{ fontWeight: 600 }}>{b.bidderName}</div>
 
                       {index === 0 && (
-                        <div
-                          className="small"
-                          style={{ color: "var(--cyan)" }}
-                        >
+                        <div className="small" style={{ color: "var(--cyan)" }}>
                           Highest bidder
                         </div>
                       )}
@@ -200,9 +185,7 @@ export default function AuctionDetail() {
                   </div>
 
                   <div>
-                    <div className="bid-amount">
-                      {money(b.amount)}
-                    </div>
+                    <div className="bid-amount">{money(b.amount)}</div>
 
                     <div className="bid-time">
                       {new Date(b.createdAt).toLocaleTimeString()}
@@ -220,11 +203,7 @@ export default function AuctionDetail() {
           </div>
 
           <div className="price-hero">
-            {money(
-              hasBids
-                ? auction.currentHighestBid
-                : auction.startingPrice
-            )}
+            {money(hasBids ? auction.currentHighestBid : auction.startingPrice)}
           </div>
 
           <p className="muted small">
@@ -298,9 +277,7 @@ export default function AuctionDetail() {
                     type="button"
                     className="chip"
                     key={n}
-                    onClick={() =>
-                      setAmount((floor + n).toFixed(2))
-                    }
+                    onClick={() => setAmount((floor + n).toFixed(2))}
                   >
                     +${n}
                   </button>

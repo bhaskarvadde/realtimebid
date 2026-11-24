@@ -1,8 +1,10 @@
 
 package com.realtimebid.security;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,6 +22,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+
+    // Read allowed origins from application.properties
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
@@ -40,7 +46,14 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/ws/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/auctions", "/api/v1/auctions/all").permitAll()
+
+                // Public browsing for logged-out visitors
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/v1/auctions",
+                    "/api/v1/auctions/all"
+                ).permitAll()
+
                 .anyRequest().authenticated()
             )
 
@@ -57,10 +70,10 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:5173",
-            "http://localhost:5175"
-        ));
+        // Convert comma-separated property into a List
+        configuration.setAllowedOrigins(
+            Arrays.asList(allowedOrigins.split(","))
+        );
 
         configuration.setAllowedMethods(List.of(
             "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
