@@ -4,8 +4,8 @@ A full-stack auction platform where users list items and place bids, and every v
 
 | | |
 |---|---|
-| **Live app** | `https://realtimebid.vercel.app/` |
-| **API** | `https://realtimebid.onrender.com` |
+| **Live app** | https://realtimebid.vercel.app/ |
+| **API** | https://realtimebid.onrender.com |
 | **Postman collection** | [`docs/RealTimeBid.postman_collection.json`](docs/RealTimeBid.postman_collection.json) |
 
 > The API runs on a free tier and sleeps when idle. The first request after a pause can take up to a minute.
